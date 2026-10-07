@@ -1,131 +1,82 @@
-import { useState } from 'react'
 import { profileData } from '../data/profile'
+import { Mail, Phone, Linkedin, ArrowUpRight } from 'lucide-react'
 
 export function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    projectType: '2D Floor Plan',
-    description: ''
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // For now, use mailto as requested
-    const subject = `Project Enquiry: ${formData.projectType}`
-    const body = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0A%0D%0ADescription:%0D%0A${formData.description}`
-    window.location.href = `mailto:${profileData.contact.email}?subject=${subject}&body=${body}`
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
-
   return (
-    <section id="contact" className="py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto border-t border-[#343942]/50">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+    <section id="contact" className="py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto border-t border-[#343942]/50 relative overflow-hidden">
+      
+      {/* Decorative technical background */}
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(ellipse_at_top_right,_rgba(87,151,213,0.05),_transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#5797D5]/20 to-transparent pointer-events-none" />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-10">
         
+        {/* Left side text */}
         <div>
           <h2 className="font-mono text-[#5797D5] text-sm tracking-widest mb-4">07 / CONTACT</h2>
-          <p className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-balance">Have a project in mind?</p>
-          <p className="text-[#A8ADB5] text-lg mb-12 max-w-md">
-            Let's discuss your requirements and explore how CAD drafting, 3D visualization or detailing can support your next project.
+          <p className="font-heading text-4xl md:text-5xl lg:text-7xl font-bold mb-8 text-[#F5F6F7]">Let's Connect.</p>
+          <p className="text-[#A8ADB5] text-lg mb-12 max-w-md leading-relaxed">
+            I am currently open to new opportunities and freelance projects. Whether you have a question or just want to say hi, my inbox is always open. Let's discuss how my CAD drafting and visualization skills can support your engineering or architectural goals.
           </p>
-
-          <div className="space-y-6 font-mono text-sm">
-            <div>
-              <p className="text-[#A8ADB5] mb-2">Email</p>
-              <a href={`mailto:${profileData.contact.email}`} className="text-[#F5F6F7] hover:text-[#5797D5] transition-colors text-lg">
-                {profileData.contact.email}
-              </a>
-            </div>
-            <div>
-              <p className="text-[#A8ADB5] mb-2">Phone</p>
-              <a href={`tel:${profileData.contact.phone.replace(/\s+/g, '')}`} className="text-[#F5F6F7] hover:text-[#5797D5] transition-colors text-lg">
-                {profileData.contact.phone}
-              </a>
-            </div>
-            <div>
-              <p className="text-[#A8ADB5] mb-2">LinkedIn</p>
-              <a href={profileData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#F5F6F7] hover:text-[#5797D5] transition-colors text-lg">
-                Suresh Kumar V
-              </a>
-            </div>
-          </div>
         </div>
 
-        <div className="bg-[#181B20] border border-[#343942] p-8 md:p-12">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block font-mono text-sm text-[#A8ADB5] mb-2">Full Name</label>
-              <input 
-                type="text" 
-                id="name"
-                name="name"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full bg-transparent border-b border-[#343942] py-3 text-[#F5F6F7] focus:outline-none focus:border-[#5797D5] transition-colors"
-              />
+        {/* Right side static links */}
+        <div className="flex flex-col justify-center gap-6">
+          
+          <a 
+            href={`mailto:john96slm@gmail.com`}
+            className="group relative flex items-center justify-between p-8 bg-[#101216] border border-[#343942] hover:border-[#5797D5]/50 transition-all duration-500 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#5797D5]/0 to-[#5797D5]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="flex items-center gap-6 relative z-10">
+              <div className="w-12 h-12 flex items-center justify-center border border-[#343942] group-hover:border-[#5797D5]/50 text-[#A8ADB5] group-hover:text-[#5797D5] transition-colors duration-500">
+                <Mail size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-mono text-xs text-[#A8ADB5] mb-1 tracking-widest uppercase">Email Me</p>
+                <p className="text-[#F5F6F7] text-lg font-medium">john96slm@gmail.com</p>
+              </div>
             </div>
-            
-            <div>
-              <label htmlFor="email" className="block font-mono text-sm text-[#A8ADB5] mb-2">Email Address</label>
-              <input 
-                type="email" 
-                id="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full bg-transparent border-b border-[#343942] py-3 text-[#F5F6F7] focus:outline-none focus:border-[#5797D5] transition-colors"
-              />
-            </div>
+            <ArrowUpRight size={24} className="text-[#343942] group-hover:text-[#5797D5] transition-colors duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          </a>
 
-            <div>
-              <label htmlFor="projectType" className="block font-mono text-sm text-[#A8ADB5] mb-2">Project Type</label>
-              <select 
-                id="projectType"
-                name="projectType"
-                required
-                value={formData.projectType}
-                onChange={handleChange}
-                className="w-full bg-transparent border-b border-[#343942] py-3 text-[#F5F6F7] focus:outline-none focus:border-[#5797D5] transition-colors appearance-none"
-              >
-                <option value="2D Floor Plan" className="bg-[#101216]">2D Floor Plan</option>
-                <option value="3D Elevation" className="bg-[#101216]">3D Elevation</option>
-                <option value="3D Interior Design" className="bg-[#101216]">3D Interior Design</option>
-                <option value="3D Rebar Detailing" className="bg-[#101216]">3D Rebar Detailing</option>
-                <option value="Revit Modelling" className="bg-[#101216]">Revit Modelling</option>
-                <option value="Other" className="bg-[#101216]">Other</option>
-              </select>
+          <a 
+            href={`tel:+918270681789`}
+            className="group relative flex items-center justify-between p-8 bg-[#101216] border border-[#343942] hover:border-[#5797D5]/50 transition-all duration-500 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#5797D5]/0 to-[#5797D5]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="flex items-center gap-6 relative z-10">
+              <div className="w-12 h-12 flex items-center justify-center border border-[#343942] group-hover:border-[#5797D5]/50 text-[#A8ADB5] group-hover:text-[#5797D5] transition-colors duration-500">
+                <Phone size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-mono text-xs text-[#A8ADB5] mb-1 tracking-widest uppercase">Call Me</p>
+                <p className="text-[#F5F6F7] text-lg font-medium">+91 8270681789</p>
+              </div>
             </div>
+            <ArrowUpRight size={24} className="text-[#343942] group-hover:text-[#5797D5] transition-colors duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          </a>
 
-            <div>
-              <label htmlFor="description" className="block font-mono text-sm text-[#A8ADB5] mb-2">Project Description</label>
-              <textarea 
-                id="description"
-                name="description"
-                required
-                rows={4}
-                value={formData.description}
-                onChange={handleChange}
-                className="w-full bg-transparent border-b border-[#343942] py-3 text-[#F5F6F7] focus:outline-none focus:border-[#5797D5] transition-colors resize-none"
-              ></textarea>
+          <a 
+            href={profileData.contact.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex items-center justify-between p-8 bg-[#101216] border border-[#343942] hover:border-[#5797D5]/50 transition-all duration-500 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#5797D5]/0 to-[#5797D5]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="flex items-center gap-6 relative z-10">
+              <div className="w-12 h-12 flex items-center justify-center border border-[#343942] group-hover:border-[#5797D5]/50 text-[#A8ADB5] group-hover:text-[#5797D5] transition-colors duration-500">
+                <Linkedin size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="font-mono text-xs text-[#A8ADB5] mb-1 tracking-widest uppercase">LinkedIn</p>
+                <p className="text-[#F5F6F7] text-lg font-medium">Suresh Kumar V</p>
+              </div>
             </div>
+            <ArrowUpRight size={24} className="text-[#343942] group-hover:text-[#5797D5] transition-colors duration-500 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          </a>
 
-            <button 
-              type="submit"
-              className="w-full py-4 bg-[#5797D5] text-white font-medium hover:bg-[#4680b5] transition-colors mt-8"
-            >
-              Send Project Enquiry
-            </button>
-          </form>
         </div>
-
       </div>
     </section>
   )

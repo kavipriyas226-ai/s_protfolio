@@ -7,7 +7,7 @@ export const servicesData = [
   {
     title: "3D CAD Modelling",
     description: "Development of three-dimensional models and technical visualizations based on the available design requirements.",
-    tags: ["AutoCAD 3D", "SketchUp Pro"]
+    tags: ["AutoCAD 3D"]
   },
   {
     title: "Building Elevation Visualization",
@@ -17,12 +17,12 @@ export const servicesData = [
   {
     title: "Interior 3D Visualization",
     description: "Three-dimensional representations of interior layouts and design concepts.",
-    tags: ["SketchUp Pro"]
+    tags: ["SketchUp Pro", "Revit Architecture"]
   },
   {
     title: "Rebar Detailing",
     description: "Structural reinforcement detailing and 3D reinforcement presentation, subject to project requirements.",
-    tags: ["Tekla"]
+    tags: ["Tekla", "Revit Structure"]
   },
   {
     title: "Revit Modelling",

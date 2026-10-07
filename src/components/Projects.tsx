@@ -1,12 +1,11 @@
 import { projectsData } from '../data/projects'
-import { ArrowUpRight } from 'lucide-react'
 
 export function Projects() {
   return (
     <section id="projects" className="py-24 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
       <div className="mb-20">
         <h2 className="font-mono text-[#5797D5] text-sm tracking-widest mb-4">02 / SELECTED WORK</h2>
-        <p className="font-heading text-3xl md:text-5xl font-bold mb-6">Work that takes shape.</p>
+        <p className="font-heading text-3xl md:text-5xl font-bold mb-6">SELECTED CAD WORK</p>
         <p className="text-[#A8ADB5] text-lg">A selection of drafting, visualization and detailing disciplines.</p>
       </div>
 
@@ -14,39 +13,37 @@ export function Projects() {
         {projectsData.map((project, index) => (
           <div key={project.id} className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 lg:gap-24 items-center group`}>
             
-            <div className="w-full lg:w-3/5 overflow-hidden border border-[#343942] bg-[#181B20] relative aspect-[4/3] flex items-center justify-center cursor-none" data-cursor="project-img">
-              <span className="absolute z-0 font-mono text-[#A8ADB5] text-sm tracking-widest">{project.imagePlaceholder}</span>
+            <div className="w-full lg:w-3/5 overflow-hidden border border-[#343942] bg-[#101216] relative aspect-[16/9] flex items-center justify-center cursor-none group/img">
               <img 
                 src={project.image} 
                 alt={project.title}
-                className="w-full h-full object-cover relative z-10 transition-transform duration-700 group-hover:scale-105"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
+                className="w-full h-full object-cover relative z-10 transition-transform duration-1000 ease-out group-hover/img:scale-105"
               />
+              
+              {/* Minimal Technical Hover Overlay */}
+              <div className="absolute inset-0 z-20 bg-gradient-to-tr from-[#101216]/40 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              <div className="absolute inset-0 z-20 border-[0.5px] border-[#5797D5]/30 opacity-0 group-hover/img:opacity-100 scale-95 group-hover/img:scale-100 transition-all duration-700 ease-out pointer-events-none m-4" />
+              
+              {/* Corner Coordinate Markers */}
+              <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-[#5797D5]/60 z-30 opacity-0 group-hover/img:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-[#5797D5]/60 z-30 opacity-0 group-hover/img:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              
+              <div className="absolute bottom-6 right-8 z-20 font-mono text-[9px] text-[#5797D5] opacity-0 group-hover/img:opacity-100 transition-opacity duration-700 tracking-[0.2em] pointer-events-none">
+                VIEW: {project.id}
+              </div>
             </div>
 
             <div className="w-full lg:w-2/5 flex flex-col justify-center">
-              <p className="font-mono text-[#5797D5] text-sm mb-4 tracking-widest">{project.category}</p>
-              <h3 className="font-heading text-3xl md:text-4xl font-bold mb-6 group-hover:text-[#5797D5] transition-colors">{project.title}</h3>
+              <h3 className="font-heading text-3xl md:text-4xl font-bold mb-6 transition-colors">{project.title}</h3>
               <p className="text-[#A8ADB5] mb-8 text-lg leading-relaxed">{project.description}</p>
               
-              <div className="flex flex-wrap gap-3 mb-10">
+              <div className="flex flex-wrap gap-3">
                 {project.software.map(sw => (
                   <span key={sw} className="px-3 py-1 border border-[#343942] text-[#F5F6F7] text-xs font-mono">
                     {sw}
                   </span>
                 ))}
               </div>
-
-              <a 
-                href="#" 
-                data-cursor="project-link"
-                className="inline-flex items-center gap-2 text-[#F5F6F7] font-medium border-b border-[#343942] pb-1 w-max hover:border-[#5797D5] hover:text-[#5797D5] transition-colors"
-                onClick={(e) => e.preventDefault()}
-              >
-                View Project <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-              </a>
             </div>
           </div>
         ))}

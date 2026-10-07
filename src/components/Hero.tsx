@@ -2,105 +2,63 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { FloorPlanSVG, ElevationSVG, StructuralSVG, RebarSVG } from './CADBackgrounds'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Staggered text component
-const StaggeredText = ({ text, delay = 0, className = "" }: { text: string, delay?: number, className?: string }) => {
-  const words = text.split(" ")
-  
-  return (
-    <div className={`flex flex-wrap gap-x-2 ${className}`}>
-      {words.map((word, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 20, rotateX: 90 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ 
-            duration: 0.8, 
-            delay: delay + (i * 0.1),
-            ease: [0.215, 0.61, 0.355, 1] 
-          }}
-          className="inline-block origin-bottom"
-          style={{ transformPerspective: 400 }}
-        >
-          {word}
-        </motion.span>
-      ))}
-    </div>
-  )
-}
-
-// Particle component
-const Particles = () => {
-  const particles = Array.from({ length: 30 })
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-[1px] h-[1px] bg-[#5797D5] rounded-full"
-          initial={{ 
-            x: `${Math.random() * 100}vw`, 
-            y: `${Math.random() * 100}vh`,
-            opacity: Math.random() * 0.5 + 0.1
-          }}
-          animate={{ 
-            y: [`${Math.random() * 100}vh`, `${Math.random() * -20}vh`],
-            opacity: [null, 0]
-          }}
-          transition={{ 
-            duration: Math.random() * 10 + 10,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const portraitRef = useRef<HTMLDivElement>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const portraitRef = useRef<HTMLImageElement>(null)
+  const bgLayersRef = useRef<HTMLDivElement>(null)
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const { innerWidth, innerHeight } = window
-      const x = (e.clientX / innerWidth - 0.5) * 20
-      const y = (e.clientY / innerHeight - 0.5) * 20
-      setMousePosition({ x, y })
+      const x = (e.clientX / innerWidth - 0.5) * 2
+      const y = (e.clientY / innerHeight - 0.5) * 2
+      setMousePos({ x, y })
     }
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
   useEffect(() => {
-    if (!containerRef.current || !portraitRef.current) return
+    if (!containerRef.current || !portraitRef.current || !bgLayersRef.current) return
     const isMobile = window.innerWidth < 768
 
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '+=150%',
-        pin: true,
-        scrub: true,
-      })
-
-      // Simulate 360/parallax with GSAP on scroll
-      gsap.to(portraitRef.current, {
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: '+=150%',
+          end: '+=200%',
+          pin: true,
           scrub: 1,
-        },
-        rotateY: isMobile ? 0 : 360,
-        scale: isMobile ? 1 : 1.05,
-        ease: "none",
+        }
       })
+
+      // Parallax portrait forward
+      tl.to(portraitRef.current, {
+        scale: isMobile ? 1 : 1.15,
+        y: isMobile ? 0 : 50,
+        ease: "none"
+      }, 0)
+
+      // Move background layers
+      tl.to(bgLayersRef.current, {
+        y: -100,
+        opacity: 0.3,
+        ease: "none"
+      }, 0)
+      
+      // Typography upwards
+      tl.to('.hero-text-content', {
+        y: -150,
+        opacity: 0,
+        ease: "none"
+      }, 0)
+
     }, containerRef)
 
     return () => ctx.revert()
@@ -110,128 +68,183 @@ export function Hero() {
     <section 
       id="home" 
       ref={containerRef}
-      className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0a0a0c]"
+      className="relative h-screen w-full flex items-center overflow-hidden bg-[#0B0D10]"
     >
-      {/* Cinematic Background */}
-      <div className="absolute inset-0 bg-blueprint-grid opacity-20" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#181B20]/40 via-[#0a0a0c]/80 to-[#0a0a0c] pointer-events-none" />
-      
-      {/* Soft Moving Light */}
-      <motion.div 
-        animate={{
-          x: mousePosition.x * -5,
-          y: mousePosition.y * -5,
-        }}
-        className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-[#5797D5] rounded-full blur-[150px] opacity-[0.03] pointer-events-none transition-transform duration-1000 ease-out"
-      />
-      
-      <Particles />
+      {/* --- CAD BACKGROUND LAYERS --- */}
+      <div 
+        ref={bgLayersRef}
+        className="absolute inset-0 w-full h-full pointer-events-none perspective-[1000px]"
+      >
+        {/* Layer 1: Background (Structural Top) */}
+        <motion.div 
+          className="absolute -top-[10%] -left-[10%] w-[120%] h-[120%] text-[#2a2e35]"
+          style={{ x: mousePos.x * -10, y: mousePos.y * -10, translateZ: -200 }}
+        >
+          <StructuralSVG className="w-full h-full opacity-30" />
+          <div className="absolute top-[15%] left-[45%] font-mono text-xs tracking-widest text-[#5797D5]/40">STRUCTURAL DETAIL</div>
+        </motion.div>
 
-      {/* Main Content Container */}
-      <div className="relative z-10 w-full h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between">
+        {/* Layer 2: Midground Left (Floor Plan) */}
+        <motion.div 
+          className="absolute top-[10%] -left-[5%] w-[60%] h-[80%] text-[#3a3f47]"
+          style={{ x: mousePos.x * -20, y: mousePos.y * -20, translateZ: -100 }}
+        >
+          <FloorPlanSVG className="w-full h-full opacity-60" />
+          <div className="absolute top-[10%] left-[20%] font-mono text-[10px] tracking-widest text-[#A8ADB5]">
+            <p>FLOOR PLAN</p>
+            <p>PLAN VIEW</p>
+            <p>A-01</p>
+          </div>
+          {/* Software Tag */}
+          <div className="absolute bottom-[20%] right-[10%] bg-[#0B0D10]/80 border border-[#5797D5]/30 px-3 py-1 font-mono text-[10px] text-[#5797D5] backdrop-blur-sm">
+            AUTOCAD / 2D
+          </div>
+        </motion.div>
+
+        {/* Layer 3: Midground Right (3D Elevation) */}
+        <motion.div 
+          className="absolute top-[5%] -right-[5%] w-[60%] h-[80%] text-[#4a515c]"
+          style={{ x: mousePos.x * -30, y: mousePos.y * -30, translateZ: -50 }}
+        >
+          <ElevationSVG className="w-full h-full opacity-50" />
+          <div className="absolute top-[15%] right-[20%] font-mono text-[10px] tracking-widest text-[#A8ADB5] text-right">
+            <p>3D ELEVATION</p>
+            <p>A-03</p>
+          </div>
+          {/* Software Tag */}
+          <div className="absolute top-[40%] left-[10%] bg-[#0B0D10]/80 border border-[#5797D5]/30 px-3 py-1 font-mono text-[10px] text-[#5797D5] backdrop-blur-sm">
+            SKETCHUP / 3D
+          </div>
+        </motion.div>
+
+        {/* Layer 4: Lower Area (Rebar & Interior blend) */}
+        <motion.div 
+          className="absolute -bottom-[10%] right-[10%] w-[50%] h-[60%] text-[#5797D5]"
+          style={{ x: mousePos.x * -40, y: mousePos.y * -40, translateZ: 0 }}
+        >
+          <RebarSVG className="w-full h-full opacity-40" />
+          <div className="absolute bottom-[25%] left-[20%] font-mono text-[10px] tracking-widest text-[#5797D5] opacity-70">
+            <p>REBAR DETAILING</p>
+            <p>STRUCTURAL MODEL</p>
+          </div>
+          {/* Software Tag */}
+          <div className="absolute top-[30%] right-[20%] bg-[#0B0D10]/80 border border-[#5797D5]/30 px-3 py-1 font-mono text-[10px] text-[#F5F6F7] backdrop-blur-sm">
+            TEKLA / REBAR
+          </div>
+          <div className="absolute bottom-[40%] right-[40%] bg-[#0B0D10]/80 border border-[#5797D5]/30 px-3 py-1 font-mono text-[10px] text-[#F5F6F7] backdrop-blur-sm">
+            REVIT / STRUCTURE
+          </div>
+        </motion.div>
         
-        {/* Left Text Content */}
-        <div className="w-full md:w-1/2 mt-32 md:mt-0 flex flex-col z-20 pointer-events-auto">
+        {/* Subtle interior block blend (simulated with CSS grid for a geometric feel) */}
+        <motion.div 
+           className="absolute bottom-0 right-[5%] w-[30%] h-[40%] bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.02)_50%,transparent_75%)] bg-[length:20px_20px] opacity-30"
+           style={{ x: mousePos.x * -15, y: mousePos.y * -15, translateZ: -150 }}
+        />
+      </div>
+
+      {/* --- DIRECTIONAL CINEMATIC LIGHTING --- */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_50%,_rgba(87,151,213,0.08),_transparent_60%)] pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D10] via-transparent to-[#0B0D10]/50 pointer-events-none z-10" />
+
+      {/* --- FOREGROUND CONTENT --- */}
+      <div className="relative z-20 w-full h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center">
+        
+        {/* Typography (Left) */}
+        <div className="hero-text-content w-full md:w-[55%] mt-32 md:mt-0 flex flex-col justify-center pointer-events-auto">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.5, duration: 0.8 }}
-            className="flex items-center gap-4 mb-6"
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="mb-4"
           >
-            <div className="w-8 h-[1px] bg-[#5797D5]" />
-            <p className="font-mono text-[#5797D5] text-[10px] md:text-xs tracking-[0.2em] uppercase">
-              CAD Designer | 3D Visualization
-            </p>
+            <span className="font-mono text-[#5797D5] text-[10px] tracking-[0.3em] uppercase">V. SURESH KUMAR</span>
           </motion.div>
 
-          <div className="font-heading text-4xl md:text-6xl lg:text-[5rem] font-bold leading-[1.1] mb-8 text-[#F5F6F7]">
-            <StaggeredText text="Designing spaces." delay={1.7} />
-            <StaggeredText text="Detailing structures." delay={2.0} />
-            <StaggeredText text="Bringing ideas to life." delay={2.3} className="text-[#A8ADB5]" />
-          </div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.8 }}
+            className="font-heading text-3xl md:text-5xl font-bold tracking-tight text-[#A8ADB5] mb-2"
+          >
+            CAD DESIGNER
+          </motion.h1>
+
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+            className="font-heading text-4xl md:text-6xl lg:text-[5rem] font-bold leading-[1.1] text-[#F5F6F7] mb-8"
+          >
+            DESIGNING WITH<br />PRECISION.
+          </motion.h2>
 
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 2.8, duration: 1 }}
-            className="text-[#A8ADB5] text-sm md:text-base max-w-md mb-10 leading-relaxed border-l border-[#343942] pl-6"
+            transition={{ delay: 1.1, duration: 1 }}
+            className="text-[#F5F6F7] font-medium text-sm md:text-base tracking-wide mb-4"
           >
-            I'm V. Suresh Kumar, a CAD Designer with one year of professional experience, focused on technical drawings, 3D visualization and structural detailing.
+            2D Drafting • 3D Visualization • Structural Detailing
+          </motion.p>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3, duration: 1 }}
+            className="text-[#A8ADB5] text-sm max-w-md mb-10 leading-relaxed"
+          >
+            Creating precise technical drawings, architectural visualizations and detailed CAD models with professional design workflows.
           </motion.p>
           
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.0, duration: 0.8 }}
-            className="flex flex-wrap gap-4"
+            transition={{ delay: 1.5, duration: 0.8 }}
+            className="flex flex-wrap gap-6"
           >
             <button 
               onClick={() => document.querySelector('#projects')?.scrollIntoView({behavior: 'smooth'})}
-              className="group relative px-8 py-4 bg-[#F5F6F7] text-[#0a0a0c] font-medium text-sm overflow-hidden"
+              className="group relative text-[#F5F6F7] font-medium text-xs tracking-widest uppercase flex items-center gap-2 overflow-hidden"
             >
-              <div className="absolute inset-0 bg-[#5797D5] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.76,0,0.24,1]" />
-              <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors duration-500">
-                EXPLORE MY WORK
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="translate-x-0 group-hover:translate-x-1 transition-transform">
-                  <path d="M1 6H11M11 6L6 1M11 6L6 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
+              <span className="relative z-10">VIEW MY WORK</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 transition-transform group-hover:translate-x-1">
+                <path d="M1 6H11M11 6L6 1M11 6L6 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-[#5797D5] scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
             </button>
             <button 
               onClick={() => document.querySelector('#contact')?.scrollIntoView({behavior: 'smooth'})}
-              className="group px-8 py-4 bg-transparent border border-[#343942] text-[#F5F6F7] font-medium text-sm hover:border-[#5797D5] hover:text-[#5797D5] transition-all duration-500"
+              className="group relative text-[#A8ADB5] hover:text-[#F5F6F7] font-medium text-xs tracking-widest uppercase flex items-center gap-2 transition-colors"
             >
-              LET'S CONNECT
+              <span>LET'S CONNECT</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform group-hover:translate-x-1">
+                <path d="M1 6H11M11 6L6 1M11 6L6 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
           </motion.div>
         </div>
 
-        {/* Right Portrait Container */}
-        <div className="w-full md:w-1/2 h-[50vh] md:h-[85vh] relative flex items-center justify-center md:justify-end mt-12 md:mt-0 perspective-[1200px]">
-          
-          {/* Technical measurements overlay */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2.5, duration: 1 }}
-            className="absolute inset-0 pointer-events-none z-20 hidden md:block"
-          >
-            <div className="absolute top-[10%] left-[20%] w-[1px] h-[80%] bg-gradient-to-b from-transparent via-[#5797D5]/20 to-transparent" />
-            <div className="absolute top-[50%] left-[10%] w-[80%] h-[1px] bg-gradient-to-r from-transparent via-[#5797D5]/20 to-transparent" />
-            <div className="absolute top-[15%] right-[15%] font-mono text-[9px] text-[#5797D5]/60 tracking-widest">
-              Z-INDEX: 0.998<br/>SCALE: 1.00
-            </div>
-            <div className="absolute bottom-[20%] left-[15%] font-mono text-[9px] text-[#5797D5]/60 tracking-widest">
-              COORD: {Math.round(mousePosition.x * 100)}, {Math.round(mousePosition.y * 100)}
-            </div>
-          </motion.div>
-
+        {/* Suresh Portrait (Right) */}
+        <div className="w-full md:w-[45%] h-[50vh] md:h-[90vh] relative flex items-end justify-center md:justify-end mt-12 md:mt-0">
           <motion.div
-            initial={{ opacity: 0, clipPath: 'inset(100% 0 0 0)' }}
-            animate={{ opacity: 1, clipPath: 'inset(0% 0 0 0)' }}
-            transition={{ delay: 1.2, duration: 1.5, ease: [0.76, 0, 0.24, 1] }}
-            className="relative z-10 w-[85%] md:w-[90%] max-w-[500px] h-full"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 1.5, ease: "easeOut" }}
+            className="relative w-[90%] max-w-[500px] h-full"
             style={{
-              x: mousePosition.x * 10,
-              y: mousePosition.y * 10,
-              rotateX: mousePosition.y * -1,
-              rotateY: mousePosition.x * 1,
+              x: mousePos.x * -10,
+              y: mousePos.y * -10,
             }}
           >
-            <div 
+            <img 
               ref={portraitRef}
-              className="w-full h-full relative group transform-style-3d overflow-hidden border border-[#343942]/30 bg-[#101216]/50 backdrop-blur-sm"
-            >
-              {/* Actual image element */}
-              <img 
-                src="/src/assets/images/hero/suresh-portrait.png" 
-                alt="V. Suresh Kumar"
-                className="absolute inset-0 w-full h-full object-contain object-bottom transition-all duration-700 brightness-90 contrast-125 hover:brightness-100"
-              />
-              
-              {/* Light sweep effect */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#5797D5]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none mix-blend-overlay" />
-            </div>
+              src="/src/assets/images/hero/suresh-portrait-transparent.png" 
+              alt="V. Suresh Kumar"
+              className="absolute bottom-0 w-full h-full object-contain object-bottom drop-shadow-[0_0_30px_rgba(87,151,213,0.15)]"
+            />
+            {/* Subtle blue rim light effect on the image */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#5797D5]/10 to-transparent pointer-events-none mix-blend-overlay" />
           </motion.div>
         </div>
       </div>
@@ -240,7 +253,7 @@ export function Hero() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 3.5, duration: 1 }}
+        transition={{ delay: 2.5, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-30 pointer-events-none"
       >
         <span className="font-mono text-[9px] tracking-[0.3em] text-[#A8ADB5]">SCROLL TO EXPLORE</span>
